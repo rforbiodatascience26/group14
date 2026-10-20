@@ -4,4 +4,12 @@ format: html
 editor: visual
 ---
 
-## 
+## Background
+
+## Aim
+
+## Loading data
+
+## Data Analysis
+
+## Conclusion
