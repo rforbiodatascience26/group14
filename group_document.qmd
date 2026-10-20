@@ -6,7 +6,11 @@ editor: visual
 
 ## Mireia
 
-Hello my name is Mireia :)
+### New Analysis
+
+```{r}
+m <- 5
+```
 
 ## Marta
 
@@ -15,6 +19,18 @@ b <- 3
 ```
 
 Marta's text
+
+### Marta's subsection
+
+12345
+
+```{r}
+c <- 5
+```
+
+```{r}
+print("hello")
+```
 
 ## Mandy
 
