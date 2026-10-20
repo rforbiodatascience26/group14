@@ -6,7 +6,11 @@ editor: visual
 
 ## Mireia
 
-Hello my name is Mireia :)
+### New Analysis
+
+```{r}
+m <- 5
+```
 
 ## Marta
 
@@ -21,4 +25,3 @@ Marta's text
 ```{r}
 a <- c("a","c","c","c")
 ```
-
