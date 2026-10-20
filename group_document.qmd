@@ -8,4 +8,10 @@ editor: visual
 
 ## Marta
 
+```{r}
+b <- 3
+```
+
+Marta's text
+
 ## Mandy
