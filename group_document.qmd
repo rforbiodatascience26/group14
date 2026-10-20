@@ -9,3 +9,8 @@ editor: visual
 ## Marta
 
 ## Mandy
+
+```{r}
+a <- c("a","c","c","c")
+```
+
