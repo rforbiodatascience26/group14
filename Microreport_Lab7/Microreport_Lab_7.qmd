@@ -6,10 +6,112 @@ editor: visual
 
 ## Background
 
+Diabetes mellitus remains a major global public health crisis with a growing burden across adult populations. The etiology of Type 2 diabetes mellitus (T2DM) involves a complex interplay between modifiable and non-modifiable risk factors. Excess body weight and body mass index (BMI) is a primary driver of systemic insulin resistance, chronic low-grade inflammation, and metabolic derangement (Yan et al., 2023).
+
+Advancing age is currently beeing studied as a possible independent risk factor for the development of the disease. Characterized by progressive declines in pancreatic $\beta$-cell function, loss of skeletal muscle mass (sarcopenia), and reduced peripheral glucose clearance (Malandrino et al., 2024; Yan et al., 2023).
+
 ## Aim
 
-## Loading data
+This study aims to evaluate the interrelations between age and BMI in the development of diabetes, specifically testing for additive or multiplicative synergistic effects between both variables while investigating sex-specific risk trajectories.
+
+To address these objectives, the study focuses on the following research questions:
+
+1.  **Synergistic Effects:** Is there a statistically significant interaction (additive or multiplicative) between age and BMI in predicting incident diabetes, indicating a synergistic effect between adiposity and advancing age?
+
+2.  **Sexual Dimorphism:** How does the joint impact of age and BMI manifest across biological sexes, and do males and females exhibit distinct risk trajectories over time?
+
+## Loading libraries
+
+```{r}
+library(readr)
+library(tidyverse)
+library(ggplot2)
+```
+
+## Loading data:
+
+```{r}
+diabetes_raw <- read_csv("raw_data/diabetes.csv")
+```
 
 ## Data Analysis
 
+### Search for synergetic effects:
+
+We will first represent the data using boxplots to observe general trends. To do that we must first stratify our population based on age and BMI
+
+```{r}
+
+diabetes <- diabetes_raw
+
+BMI_levels <- c("Underweight","Regular wheight", "overwheight","obese")
+age_levels <- c("young","adult","mature","old")
+
+# stratifying data
+diabetes <- diabetes |> 
+  filter(!(is.na(height))) |> 
+  filter(!(is.na(weight))) |> 
+  mutate(BMI = (weight/(height^2)) * 703) |> 
+  mutate(BMI_class = case_when(
+    BMI < 18.5 ~ "Underweight",
+    BMI >= 18.5 & BMI < 25.5 ~ "Regular wheight",
+    BMI >= 25.5 & BMI < 30 ~ "overwheight", 
+    BMI >= 30 ~ "obese"
+  )) |> 
+  mutate(age_group = case_when(
+    age < 25 ~ "young",
+    age >= 25 & age < 50 ~ "adult",
+    age >= 50 & age< 75 ~ "mature", 
+    age >= 75 ~ "old"
+  ))
+
+# Number of each group:
+groups <- diabetes |> 
+  group_by(age_group, BMI_class) |> 
+  summarize(sum_individuals = n())
+
+total <-  sum(groups$sum_individuals)
+
+groups <- groups |> 
+  mutate(prop = sum_individuals/total)
+
+diabetes <- ungroup(diabetes)
+
+BMI_factor <- factor(diabetes$BMI_class, levels = BMI_levels)
+age_factor <- factor(age_levels, levels = age_levels)
+
+
+
+```
+
+Now we can represent the data:
+
+```{r}
+
+groups_prop <- groups %>%
+  group_by(age_group) %>%
+  mutate(prop = sum_individuals / sum(sum_individuals))
+
+ggplot(groups_prop, aes(x = "", y = prop, fill = BMI_class)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  facet_wrap(~ age_group) +
+  theme_void() +
+  labs(
+    title = "Normalized distribution of BMI indexes based on age groups",
+    subtitle = "Age Index: young (< 25) | adult (25-50) | mature (50-75) | old (75+)", # Cambia estos rangos según tus datos reales
+    fill = "BMI Class"
+  ) 
+```
+
 ## Conclusion
+
+## Bibliobraphy:
+
+Chen, Y., Zhang, X.-P., Yuan, J., Cai, B., Wang, X.-L., Wu, X.-L., Zhang, Y.-H., Zhang, X.-Y., Yin, T., Zhu, X.-H., Gu, Y.-J., Cui, S.-W., Lu, Z.-Q., & Li, X.-Y. (2018). Association of body mass index and age with incident diabetes in Chinese adults: a population-based cohort study. *BMJ Open*, *8*(9), e021768. <https://doi.org/10.1136/bmjopen-2018-021768> Cited by: 305
+
+Malandrino, N., Metter, E. J., Simonsick, E. M., Egan, J. M., Chia, C. W., Walston, J. D., Ferrucci, L., & Kalyani, R. R. (2024). Body Mass Index and Diabetes Incidence Across the Adult Lifespan: The Baltimore Longitudinal Study of Aging. *Journal of the Endocrine Society*, *8*(11), bvae156. <https://doi.org/10.1210/jendso/bvae156> Cited by: 9
+
+Wu, B., Chen, Y., Xu, H., Chen, Y., Dong, X., & Fu, C. (2023). Sex and age differences in the association between obesity and long-term changes with the risk of incident type 2 diabetes mellitus: the Rural Deqing Cohort Study. *Hepatobiliary Surgery and Nutrition*, *0*, 0–0. <https://doi.org/10.21037/hbsn-24-417> Cited by: 2
+
+Yan, Z., Cai, M., Han, X., Chen, Q., & Lu, H. (2023). The Interaction Between Age and Risk Factors for Diabetes and Prediabetes: A Community-Based Cross-Sectional Study. *Diabetes, Metabolic Syndrome and Obesity*, *16*, 85–93. <https://doi.org/10.2147/dmso.s390857> Cited by: 211
