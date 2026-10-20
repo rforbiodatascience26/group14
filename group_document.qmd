@@ -6,7 +6,15 @@ editor: visual
 
 ## Mireia
 
+Hello my name is Mireia :)
+
 ## Marta
+
+```{r}
+b <- 3
+```
+
+Marta's text
 
 ## Mandy
 
