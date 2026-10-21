@@ -26,6 +26,8 @@ To address these objectives, the study focuses on the following research questio
 library(readr)
 library(tidyverse)
 library(ggplot2)
+library(broom)
+library("ggrepel")
 ```
 
 ## Loading data:
@@ -36,8 +38,7 @@ diabetes_raw <- read_csv("raw_data/diabetes.csv")
 
 ## Data Preparation
 
-Before performing PCA, the available variables and their data types were
-inspected to identify suitable numerical variables for the analysis.
+Before performing PCA, the available variables and their data types were inspected to identify suitable numerical variables for the analysis.
 
 ```{r}
 names(diabetes_raw)
@@ -116,6 +117,158 @@ ggplot(groups_prop, aes(x = "", y = prop, fill = BMI_class)) +
     fill = "BMI Class"
   ) 
 ```
+
+### Principal Component Analysis
+
+```{r}
+pca_data <- diabetes |>
+  select(
+    gender,
+    BMI_class,
+    age,
+    BMI,
+    waist,
+    hip,
+    chol,
+    stab.glu,
+    hdl,
+    glyhb,
+    bp.1s,
+    bp.1d
+  ) |>
+  drop_na()
+```
+
+```{r}
+pca_fit <- pca_data |>
+  select(where(is.numeric)) |>
+  prcomp(
+    scale = TRUE
+  )
+pca_scores <- pca_fit |>
+  augment(pca_data)
+
+pca_scores |>
+  ggplot(
+    aes(
+      x = .fittedPC1,
+      y = .fittedPC2,
+      colour = BMI_class,
+      shape = gender
+    )
+  ) +
+  geom_point(
+    size = 2,
+    alpha = 0.7
+  ) +
+  labs(
+    title = "Individuals in PCA Space",
+    x = "PC1",
+    y = "PC2",
+    colour = "BMI class",
+    shape = "Sex"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+pca_loadings <- pca_fit |>
+  tidy(
+    matrix = "rotation"
+  )
+
+pca_loadings
+```
+
+```{r}
+pca_loadings |>
+  filter(
+    PC %in% c(1, 2)
+  ) |>
+  pivot_wider(
+    names_from = PC,
+    names_prefix = "PC",
+    values_from = value
+  ) |>
+  ggplot(
+    aes(
+      x = PC1,
+      y = PC2
+    )
+  ) +
+  geom_hline(
+    yintercept = 0,
+    linetype = "dashed"
+  ) +
+  geom_vline(
+    xintercept = 0,
+    linetype = "dashed"
+  ) +
+  geom_segment(
+    aes(
+      xend = 0,
+      yend = 0
+    ),
+    arrow = arrow_style
+  ) +
+  geom_text_repel(
+    aes(
+      label = column
+    ),
+    size = 4
+  ) +
+  coord_fixed() +
+  labs(
+    title = "Variable Loadings on PC1 and PC2",
+    x = "PC1 loading",
+    y = "PC2 loading"
+  ) +
+  theme_minimal()
+```
+
+### Variance Explained by the Principal Components
+
+The proportion of total variance explained by each principal component was extracted to assess how much information is retained by the first components.
+
+```{r}
+pca_variance <- pca_fit |>
+  tidy(
+    matrix = "eigenvalues"
+  )
+
+pca_variance
+```
+
+```{r}
+pca_variance |>
+  ggplot(
+    aes(
+      x = PC,
+      y = percent
+    )
+  ) +
+  geom_col(
+    fill = "#56B4E9",
+    alpha = 0.8
+  ) +
+  scale_x_continuous(
+    breaks = 1:10
+  ) +
+  scale_y_continuous(
+    labels = scales::percent_format(),
+    expand = expansion(
+      mult = c(0, 0.01)
+    )
+  ) +
+  labs(
+    title = "Variance Explained by Each Principal Component",
+    x = "Principal component",
+    y = "Variance explained"
+  ) +
+  theme_minimal()
+```
+
+PC1 explained 31.9% of the total variance, while PC2 explained 20.4%. Together, the first two principal components explained 52.3% of the total variance in the selected variables.
 
 ## Conclusion
 
