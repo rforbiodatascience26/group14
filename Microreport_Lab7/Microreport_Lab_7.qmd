@@ -34,6 +34,19 @@ library(ggplot2)
 diabetes_raw <- read_csv("raw_data/diabetes.csv")
 ```
 
+## Data Preparation
+
+Before performing PCA, the available variables and their data types were
+inspected to identify suitable numerical variables for the analysis.
+
+```{r}
+names(diabetes_raw)
+```
+
+```{r}
+glimpse(diabetes_raw)
+```
+
 ## Data Analysis
 
 ### Search for synergetic effects:
