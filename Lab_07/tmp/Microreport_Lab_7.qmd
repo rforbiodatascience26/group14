@@ -16,7 +16,7 @@ author:
 
 Diabetes mellitus remains a major global public health crisis with a growing burden across adult populations. The etiology of Type 2 diabetes mellitus (T2DM) involves a complex interplay between modifiable and non-modifiable risk factors. Excess body weight and body mass index (BMI) is a primary driver of systemic insulin resistance, chronic low-grade inflammation, and metabolic derangement (Yan et al., 2023).
 
-Advancing age is currently beeing studied as a possible independent risk factor for the development of the disease. Characterized by progressive declines in pancreatic $\beta$-cell function, loss of skeletal muscle mass (sarcopenia), and reduced peripheral glucose clearance (Malandrino et al., 2024; Yan et al., 2023).
+Advancing age is currently being studied as a possible independent risk factor for the development of the disease. Characterized by progressive declines in pancreatic $\beta$-cell function, loss of skeletal muscle mass (sarcopenia), and reduced peripheral glucose clearance (Malandrino et al., 2024; Yan et al., 2023).
 
 ## Aim
 
@@ -79,7 +79,7 @@ We will first represent the data using boxplots to observe general trends. To do
 
 diabetes <- diabetes_raw
 
-BMI_levels <- c("Underweight","Regular wheight", "overwheight","obese")
+BMI_levels <- c("Underweight","Regular weight", "overweight","obese")
 age_levels <- c("young","adult","mature","old")
 
 # stratifying data
@@ -89,16 +89,16 @@ diabetes <- diabetes |>
   mutate(BMI = (weight/(height^2)) * 703) |> 
   mutate(BMI_class = case_when(
     BMI < 18.5 ~ "Underweight",
-    BMI >= 18.5 & BMI < 25.5 ~ "Regular wheight",
-    BMI >= 25.5 & BMI < 30 ~ "overwheight", 
+    BMI >= 18.5 & BMI < 25.5 ~ "Regular weight",
+    BMI >= 25.5 & BMI < 30 ~ "overweight",
     BMI >= 30 ~ "obese"
-  )) |> 
-  mutate(age_group = case_when(
+  )) |>
+  mutate(age_group = factor(case_when(
     age < 25 ~ "young",
     age >= 25 & age < 50 ~ "adult",
-    age >= 50 & age< 75 ~ "mature", 
+    age >= 50 & age < 75 ~ "mature",
     age >= 75 ~ "old"
-  ))
+  ), levels = age_levels))
 
 # Number of each group:
 groups <- diabetes |> 
@@ -126,15 +126,21 @@ Now we can represent the data:
 groups_prop <- groups |>
   group_by(age_group) |>
   mutate(
-    prop = sum_individuals / sum(sum_individuals),
-    age_group = paste(
-      str_to_sentence(age_group),
-      recode_values(
-        age_group,
-        "young" ~ "(<25)",
-        "adult" ~ "(25–49)",
-        "mature" ~ "(50–74)",
-        "old" ~ "(≥75)"
+    prop = sum_individuals / sum(sum_individuals)
+  ) |>
+  ungroup() |>
+  mutate(
+    age_group = fct_relabel(
+      age_group,
+      ~ paste(
+        str_to_sentence(.x),
+        recode_values(
+          .x,
+          "young" ~ "(<25)",
+          "adult" ~ "(25–49)",
+          "mature" ~ "(50–74)",
+          "old" ~ "(≥75)"
+        )
       )
     )
   )
@@ -402,7 +408,7 @@ Search for sexual dimorphism: No evidence of sexual dimorphism was found in the 
 
 The cumulative variance plot shows that the first four components explain around 77% of the total variance, while five components explain more than 80%. This means that the first two components are useful for visualizing the data, but they do not capture all its variability. Including more components allows us to retain more information from the original dataset.
 
-## Bibliobraphy:
+## Bibliography:
 
 Chen, Y., Zhang, X.-P., Yuan, J., Cai, B., Wang, X.-L., Wu, X.-L., Zhang, Y.-H., Zhang, X.-Y., Yin, T., Zhu, X.-H., Gu, Y.-J., Cui, S.-W., Lu, Z.-Q., & Li, X.-Y. (2018). Association of body mass index and age with incident diabetes in Chinese adults: a population-based cohort study. *BMJ Open*, *8*(9), e021768. <https://doi.org/10.1136/bmjopen-2018-021768> Cited by: 305
 
