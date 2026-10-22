@@ -34,11 +34,11 @@ To address these objectives, the study focuses on the following research questio
 #| label: setup
 #| message: false
 
-library(readr)
-library(tidyverse)
-library(ggplot2)
-library(broom)
-library(here)
+library("readr")
+library("tidyverse")
+library("ggplot2")
+library("broom")
+library("here")
 library("ggrepel")
 ```
 
