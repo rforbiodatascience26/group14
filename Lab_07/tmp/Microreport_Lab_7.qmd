@@ -254,6 +254,8 @@ tidy(model_male)
 
 ### Principal Component Analysis
 
+Twelve variables covering anthropometric, glycemic, lipid and blood pressure measures were selected for PCA. `bp.2s` and `bp.2d` were left out despite being otherwise relevant, since their high missingness (262 of 403 samples) suggests they were only recorded for a subset of participants rather than systematically.
+
 ```{r}
 pca_data <- diabetes |>
   select(
@@ -304,6 +306,8 @@ pca_scores |>
   ) +
   theme_minimal()
 ```
+
+PC1 separates individuals along a clear BMI gradient, from underweight to obese, while separation by sex is minor.
 
 ```{r}
 pca_loadings <- pca_fit |>
@@ -368,6 +372,8 @@ pca_loadings |>
   ) +
   theme_minimal()
 ```
+
+PC1 is dominated by body-size measures (waist, hip, BMI), while PC2 contrasts age and glycemic/blood pressure measures against those same body-size measures.
 
 ### Variance Explained by the Principal Components
 
