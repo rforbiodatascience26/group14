@@ -1,7 +1,15 @@
 ---
 title: "Microreport_diabetes"
-format: html
+format:
+  html:
+    embed-resources: true
 editor: visual
+author:
+  - name: Mireia Rivas Bermúdez - s263509
+  - name: Lukas Beržinis - s263503
+  - name: Amanda Espinas Novau - s263508
+  - name: Marta Taboada Ramírez - s263518
+  - name: Carla Ruedas - s251157
 ---
 
 ## Background
@@ -116,6 +124,60 @@ ggplot(groups_prop, aes(x = "", y = prop, fill = BMI_class)) +
     subtitle = "Age Index: young (< 25) | adult (25-50) | mature (50-75) | old (75+)", # Cambia estos rangos según tus datos reales
     fill = "BMI Class"
   ) 
+```
+
+### Search for sexual dimorphism
+
+To investigate the second research question, we tested whether the way age and BMI relate to diabetes differs between males and females.
+
+Diabetes was defined as glycosylated hemoglobin (`glyhb`) $\geq$ 6.5%
+
+```{r}
+diabetes_sex <- diabetes |>
+  filter(!is.na(glyhb), !is.na(gender)) |>
+  mutate(diabetic = as.integer(glyhb >= 6.5))
+
+# Number of individuals and prevalence by sex
+diabetes_sex |>
+  group_by(gender) |>
+  summarize(n = n(), prevalence = mean(diabetic))
+```
+
+```{r}
+ggplot(diabetes_sex, aes(x = age, y = diabetic, colour = BMI_class)) +
+  geom_smooth(method = "glm", method.args = list(family = "binomial"), se = FALSE) +
+  facet_wrap(~ gender) +
+  labs(
+    title = "Probability of diabetes by age, BMI class and sex",
+    x = "Age",
+    y = "Probability of diabetes",
+    colour = "BMI class"
+  ) +
+  theme_minimal()
+```
+
+To test for differences between sexes, we fitted two logistic regression models: one without sex and one where sex interacts with age, BMI and their interaction. Comparing them with a likelihood ratio test tells us whether sex changes the effect of age and BMI.
+
+```{r}
+model_no_sex <- glm(diabetic ~ age * BMI, data = diabetes_sex, family = binomial)
+model_sex <- glm(diabetic ~ age * BMI * gender, data = diabetes_sex, family = binomial)
+
+anova(model_no_sex, model_sex, test = "Chisq")
+```
+
+Finally, the age × BMI model was fitted separately in females and males to compare the effects within each sex.
+
+```{r}
+model_female <- glm(diabetic ~ age * BMI,
+                    data = filter(diabetes_sex, gender == "female"),
+                    family = binomial)
+
+model_male <- glm(diabetic ~ age * BMI,
+                  data = filter(diabetes_sex, gender == "male"),
+                  family = binomial)
+
+tidy(model_female)
+tidy(model_male)
 ```
 
 ### Principal Component Analysis
@@ -271,6 +333,8 @@ pca_variance |>
 PC1 explained 31.9% of the total variance, while PC2 explained 20.4%. Together, the first two principal components explained 52.3% of the total variance in the selected variables.
 
 ## Conclusion
+
+Search for sexual dimorphism: No evidence of sexual dimorphism was found in the joint effect of age and BMI on diabetes (likelihood ratio test, p = 0.63), and the age × BMI interaction was not significant in either females or males. Diabetes probability increased with age and BMI in both sexes, but the differences between sexes observed in the plots were not statistically supported.
 
 ## Bibliobraphy:
 
