@@ -118,7 +118,7 @@ After removing samples with missing height and weight values, required for calcu
 
 ### Search for synergetic effects:
 
-We will first represent the data using boxplots to observe general trends. To do that we must first stratify our population based on age and BMI
+We will first represent the data using a stacked bar chart to observe general trends. To do that we must first stratify our population based on age and BMI
 
 ```{r}
 
@@ -195,8 +195,10 @@ ggplot(groups_prop, aes(x = age_group, y = prop, fill = BMI_class)) +
     x = "Age group",
     y = "Proportion",
     fill = "BMI Class"
-  ) 
+  )
 ```
+
+The obese proportion is lowest in the young group (29%) and highest in adults and mature adults (around 40% each), dropping again in the old group (26%), where overweight becomes the largest class instead (35%).
 
 ### Search for sexual dimorphism
 
@@ -232,6 +234,13 @@ To test for differences between sexes, we fitted two logistic regression models:
 
 ```{r}
 model_no_sex <- glm(diabetic ~ age * BMI, data = diabetes_sex, family = binomial)
+
+tidy(model_no_sex)
+```
+
+Answering the first research question, the age × BMI interaction in the pooled model was not statistically significant (estimate = 0.0005, p = 0.72), so no synergistic effect between age and BMI was detected.
+
+```{r}
 model_sex <- glm(diabetic ~ age * BMI * gender, data = diabetes_sex, family = binomial)
 
 anova(model_no_sex, model_sex, test = "Chisq")
@@ -419,7 +428,7 @@ pca_variance |>
 
 PC1 explained 31.9% of the total variance, while PC2 explained 20.4%. Together, the first two principal components explained 52.3% of the total variance in the selected variables.
 
-## Cumulative Variance Explained
+### Cumulative Variance Explained
 
 The first two principal components explain 52.3% of the total variance. However, this means that almost half of the information is not represented in the first two components. To better understand how much information we keep when adding more components, we can look at the cumulative variance explained.
 
@@ -451,7 +460,9 @@ This plot shows how the explained variance increases when more principal compone
 
 ## Conclusion
 
-Search for sexual dimorphism: No evidence of sexual dimorphism was found in the joint effect of age and BMI on diabetes (likelihood ratio test, p = 0.63), and the age × BMI interaction was not significant in either females or males. Diabetes probability increased with age and BMI in both sexes, but the differences between sexes observed in the plots were not statistically supported.
+**Synergistic effects:** The age × BMI interaction was not statistically significant in the pooled model (p = 0.72), so no evidence of a synergistic effect between age and BMI on diabetes risk was found.
+
+**Sexual dimorphism:** No evidence of sexual dimorphism was found in the joint effect of age and BMI on diabetes (likelihood ratio test, p = 0.63), and the age × BMI interaction was not significant in either females or males. Diabetes probability increased with age and BMI in both sexes, but the differences between sexes observed in the plots were not statistically supported.
 
 The cumulative variance plot shows that the first four components explain around 77% of the total variance, while five components explain more than 80%. This means that the first two components are useful for visualizing the data, but they do not capture all its variability. Including more components allows us to retain more information from the original dataset.
 
