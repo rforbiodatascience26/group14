@@ -69,6 +69,51 @@ names(diabetes_raw)
 glimpse(diabetes_raw)
 ```
 
+```{r}
+variable_missingness <- diabetes_raw |> 
+  summarise(across(everything(), ~ sum(is.na(.x)))) |>
+  pivot_longer(
+    everything(), names_to = "variable", values_to = "n_missing"
+  ) |> 
+  filter(n_missing > 0)
+
+ggplot(
+  variable_missingness,
+  aes(
+    x = fct_reorder(variable, n_missing, .desc = TRUE),
+    y = n_missing, fill = n_missing)
+  ) +
+  geom_col() +
+  scale_fill_viridis_c(trans = "log10") +
+  scale_y_continuous(
+    trans = scales::pseudo_log_trans(base = 10),
+    breaks = c(0, 1, 2, 5, 10, 25, 50, 100, 250)
+  ) +
+  theme_minimal() +
+  labs(
+    title = "Missing values per variable on raw dataset",
+    x = "Variable", y = "Number missing", fill = "Missing"
+  )
+
+
+
+```
+
+The raw data consisted of 19 variables (including `id`) across 403 samples. 14 of those variables had some degree of missingness: `chol` , `hdl` , `ratio` and `weight` had missing values in just one sample, while `bp.2s` and `bp.2d` had 262 missing values each.
+
+```{r}
+# Filtering data
+
+diabetes <- diabetes_raw |>
+  filter(!(is.na(age))) |> 
+  filter(!(is.na(height))) |> 
+  filter(!(is.na(weight)))
+
+nrow(diabetes)
+```
+
+After removing samples with missing height and weight values, required for calculating BMI, we were left with 397 samples for downstream data analysis.
+
 ## Data Analysis
 
 ### Search for synergetic effects:
@@ -77,15 +122,11 @@ We will first represent the data using boxplots to observe general trends. To do
 
 ```{r}
 
-diabetes <- diabetes_raw
-
 BMI_levels <- c("Underweight","Regular weight", "overweight","obese")
 age_levels <- c("young","adult","mature","old")
 
 # stratifying data
 diabetes <- diabetes |> 
-  filter(!(is.na(height))) |> 
-  filter(!(is.na(weight))) |> 
   mutate(BMI = (weight/(height^2)) * 703) |> 
   mutate(BMI_class = case_when(
     BMI < 18.5 ~ "Underweight",
