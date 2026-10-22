@@ -31,17 +31,30 @@ To address these objectives, the study focuses on the following research questio
 ## Loading libraries
 
 ```{r}
+#| label: setup
+#| message: false
+
 library(readr)
 library(tidyverse)
 library(ggplot2)
 library(broom)
+library(here)
 library("ggrepel")
 ```
 
 ## Loading data:
 
 ```{r}
-diabetes_raw <- read_csv("raw_data/diabetes.csv")
+target_url <- "https://hbiostat.org/data/repo/diabetes.csv"
+raw_data_file <- here("data/raw_data/diabetes.csv")
+
+if (file.exists(raw_data_file)){
+  diabetes_raw <- read_csv(raw_data_file)
+} else {
+  diabetes_raw <- read_csv(file = target_url)
+  dir.create(path = dirname(raw_data_file), showWarnings = FALSE, recursive = TRUE)
+  write_csv(x = diabetes_data, file = raw_data_file)
+}
 ```
 
 ## Data Preparation
