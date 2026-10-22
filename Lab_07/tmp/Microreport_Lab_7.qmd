@@ -125,7 +125,19 @@ Now we can represent the data:
 
 groups_prop <- groups |>
   group_by(age_group) |>
-  mutate(prop = sum_individuals / sum(sum_individuals))
+  mutate(
+    prop = sum_individuals / sum(sum_individuals),
+    age_group = paste(
+      str_to_sentence(age_group),
+      case_match(
+        age_group,
+        "young" ~ "(<25)",
+        "adult" ~ "(25-50)",
+        "mature" ~ "(50-75)",
+        "old" ~ "(≥75)"
+      )
+    )
+  )
 
 ggplot(groups_prop, aes(x = "", y = prop, fill = BMI_class)) +
   geom_bar(stat = "identity", width = 1) +
@@ -134,7 +146,7 @@ ggplot(groups_prop, aes(x = "", y = prop, fill = BMI_class)) +
   theme_void() +
   labs(
     title = "Normalized distribution of BMI indexes based on age groups",
-    subtitle = "Age Index: young (< 25) | adult (25-50) | mature (50-75) | old (75+)", # Cambia estos rangos según tus datos reales
+    subtitle = "Age ranges (in years) shown in parentheses",
     fill = "BMI Class"
   ) 
 ```
