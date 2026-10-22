@@ -123,8 +123,8 @@ Now we can represent the data:
 
 ```{r}
 
-groups_prop <- groups %>%
-  group_by(age_group) %>%
+groups_prop <- groups |>
+  group_by(age_group) |>
   mutate(prop = sum_individuals / sum(sum_individuals))
 
 ggplot(groups_prop, aes(x = "", y = prop, fill = BMI_class)) +
