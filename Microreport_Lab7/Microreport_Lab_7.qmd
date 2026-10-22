@@ -243,6 +243,15 @@ pca_loadings
 ```
 
 ```{r}
+arrow_style <- arrow(
+  angle = 20,
+  ends = "first",
+  type = "closed",
+  length = grid::unit(8, "pt")
+)
+```
+
+```{r}
 pca_loadings |>
   filter(
     PC %in% c(1, 2)
@@ -332,9 +341,41 @@ pca_variance |>
 
 PC1 explained 31.9% of the total variance, while PC2 explained 20.4%. Together, the first two principal components explained 52.3% of the total variance in the selected variables.
 
+## Cumulative Variance Explained
+
+The first two principal components explain 52.3% of the total variance. However, this means that almost half of the information is not represented in the first two components. To better understand how much information we keep when adding more components, we can look at the cumulative variance explained.
+
+```{r}
+pca_variance |>
+  ggplot(aes(x = PC, y = cumulative)) +
+  geom_line() +
+  geom_point(size = 2) +
+  geom_hline(
+    yintercept = 0.8,
+    linetype = "dashed"
+  ) +
+  scale_x_continuous(
+    breaks = pca_variance$PC
+  ) +
+  scale_y_continuous(
+    labels = scales::percent_format(),
+    limits = c(0, 1)
+  ) +
+  labs(
+    title = "Cumulative Variance Explained",
+    x = "Number of principal components",
+    y = "Cumulative variance explained"
+  ) +
+  theme_minimal()
+```
+
+This plot shows how the explained variance increases when more principal components are included. The dashed line marks 80% of the total variance, making it easier to see how many components are needed to reach this level. This helps us understand how much information can be retained while reducing the number of variables.
+
 ## Conclusion
 
 Search for sexual dimorphism: No evidence of sexual dimorphism was found in the joint effect of age and BMI on diabetes (likelihood ratio test, p = 0.63), and the age × BMI interaction was not significant in either females or males. Diabetes probability increased with age and BMI in both sexes, but the differences between sexes observed in the plots were not statistically supported.
+
+The cumulative variance plot shows that the first four components explain around 77% of the total variance, while five components explain more than 80%. This means that the first two components are useful for visualizing the data, but they do not capture all its variability. Including more components allows us to retain more information from the original dataset.
 
 ## Bibliobraphy:
 
