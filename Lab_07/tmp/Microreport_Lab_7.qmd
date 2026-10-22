@@ -145,14 +145,14 @@ groups_prop <- groups |>
     )
   )
 
-ggplot(groups_prop, aes(x = "", y = prop, fill = BMI_class)) +
-  geom_bar(stat = "identity", width = 1) +
-  coord_polar("y", start = 0) +
-  facet_wrap(~ age_group) +
-  theme_void() +
+ggplot(groups_prop, aes(x = age_group, y = prop, fill = BMI_class)) +
+  geom_col(width = 0.7) +
+  theme_minimal() +
   labs(
     title = "Normalized distribution of BMI indexes based on age groups",
     subtitle = "Age ranges (in years) shown in parentheses",
+    x = "Age group",
+    y = "Proportion",
     fill = "BMI Class"
   ) 
 ```
