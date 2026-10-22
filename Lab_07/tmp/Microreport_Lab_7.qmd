@@ -129,11 +129,11 @@ groups_prop <- groups |>
     prop = sum_individuals / sum(sum_individuals),
     age_group = paste(
       str_to_sentence(age_group),
-      case_match(
+      recode_values(
         age_group,
         "young" ~ "(<25)",
-        "adult" ~ "(25-50)",
-        "mature" ~ "(50-75)",
+        "adult" ~ "(25–49)",
+        "mature" ~ "(50–74)",
         "old" ~ "(≥75)"
       )
     )
