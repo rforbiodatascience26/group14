@@ -242,13 +242,7 @@ pca_loadings <- pca_fit |>
 pca_loadings
 ```
 
-```{r}
-arrow_style <- arrow(
-  angle = 20,
-  ends = "first",
-  type = "closed",
-  length = grid::unit(8, "pt")
-)
+```{}
 ```
 
 ```{r}
